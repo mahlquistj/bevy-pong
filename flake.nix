@@ -25,31 +25,34 @@
         pkgs = import nixpkgs {
           inherit system overlays;
         };
-        libPath = with pkgs;
-          lib.makeLibraryPath [
-            libGL
-            libxkbcommon
-          ];
+        libs = with pkgs; [
+          udev
+          alsa-lib
+          vulkan-loader
+          xorg.libX11
+          xorg.libXrandr
+          xorg.libXcursor
+          xorg.libXi
+          libxkbcommon
+          wayland
+        ];
+        libPath = pkgs.lib.makeLibraryPath libs;
         rustToolchain = pkgs.pkgsBuildHost.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
       in
         with pkgs; {
           devShells.default = mkShell {
-            buildInputs = [rustToolchain];
             RUST_LOG = "debug";
             RUST_SRC_PATH = "${rust.packages.stable.rustPlatform.rustLibSrc}";
             LD_LIBRARY_PATH = libPath;
-            packages = [
-              bacon
-              cargo-nextest
-              alsa-lib
-              pkg-config
-              libudev-zero
-              vulkan-loader
-              xorg.libX11
-              xorg.libXrandr
-              xorg.libXcursor
-              xorg.libXi
-            ];
+
+            buildInputs = [rustToolchain];
+            packages =
+              [
+                bacon
+                cargo-nextest
+                pkg-config
+              ]
+              ++ libs;
           };
         }
     );
