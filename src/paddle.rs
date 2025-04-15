@@ -90,6 +90,7 @@ fn move_cpu(
     }
 }
 
+#[inline(always)]
 fn move_direction(transform: &mut Transform, direction: Dir3, time: &Time) {
     transform.translation += direction * PLAYER_SPEED * time.delta_secs();
 }

@@ -47,11 +47,10 @@ fn spawn_ball(
     ));
 }
 
-fn apply_velocity(mut query: Query<(&mut Transform, &Velocity)>, time: Res<Time>) {
-    for (mut transform, velocity) in &mut query {
-        transform.translation.x += velocity.x * time.delta_secs();
-        transform.translation.y += velocity.y * time.delta_secs();
-    }
+fn apply_velocity(query: Single<(&mut Transform, &Velocity), With<Ball>>, time: Res<Time>) {
+    let (mut transform, velocity) = query.into_inner();
+    transform.translation.x += velocity.x * time.delta_secs();
+    transform.translation.y += velocity.y * time.delta_secs();
 }
 
 fn check_collisions(

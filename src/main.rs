@@ -1,6 +1,10 @@
 use bevy::{prelude::*, sprite::Wireframe2dPlugin, window::WindowResolution};
 
-// Since the game size is fixed, we can calculate some const values
+mod arena;
+mod ball;
+mod paddle;
+
+// Since the game window size is fixed, we can calculate some const values
 const WIN_HEIGHT: f32 = 400.0;
 const WIN_WIDTH: f32 = 800.0;
 
@@ -16,10 +20,6 @@ const PLAYER_SPEED: f32 = 100.0;
 
 const BALL_INIT_SPEED: f32 = 100.0;
 const BALL_SPEEDUP_FACTOR: f32 = 1.05;
-
-mod arena;
-mod ball;
-mod paddle;
 
 /// Describes anything than can collide with the ball
 #[derive(Component)]

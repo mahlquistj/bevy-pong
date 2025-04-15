@@ -10,6 +10,9 @@
         flake-utils.follows = "flake-utils";
       };
     };
+    bevy-cli = {
+      url = "github:mahlquistj/bevy_cli";
+    };
   };
 
   outputs = {
@@ -17,6 +20,7 @@
     nixpkgs,
     flake-utils,
     rust-overlay,
+    ...
   }:
     flake-utils.lib.eachDefaultSystem
     (
@@ -51,6 +55,7 @@
                 bacon
                 cargo-nextest
                 pkg-config
+                self.inputs.bevy-cli.packages.${system}.bevy-cli
               ]
               ++ libs;
           };
