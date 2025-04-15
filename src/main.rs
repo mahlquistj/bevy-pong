@@ -14,35 +14,45 @@ const PLAYER_HEIGHT: f32 = WIN_HEIGHT / 4.0;
 const PLAYER_WIDTH: f32 = WIN_WIDTH / 100.0;
 const PLAYER_SPEED: f32 = 100.0;
 
-const BALL_INIT_SPEED: f32 = 50.0;
-const BALL_SPEEDUP_FACTOR: f32 = 1.3;
+const BALL_INIT_SPEED: f32 = 100.0;
+const BALL_SPEEDUP_FACTOR: f32 = 1.05;
 
 mod arena;
 mod ball;
-mod player;
+mod paddle;
+
+/// Describes anything than can collide with the ball
+#[derive(Component)]
+struct Collider;
 
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2d);
 }
 
 fn main() {
-    App::new()
-        // Bevy provided plugins
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                resolution: WindowResolution::new(WIN_WIDTH, WIN_HEIGHT),
-                resizable: false,
-                title: "Pong".to_string(),
-                ..default()
-            }),
+    let mut app = App::new();
+
+    log::info!("[APP] Adding bevy plugins");
+    app.add_plugins(DefaultPlugins.set(WindowPlugin {
+        primary_window: Some(Window {
+            resolution: WindowResolution::new(WIN_WIDTH, WIN_HEIGHT),
+            resizable: false,
+            title: "Pong".to_string(),
             ..default()
-        }))
-        .add_plugins(Wireframe2dPlugin)
-        // Setup
-        .add_systems(Startup, setup)
-        // Custom plugins
-        .add_plugins(arena::ArenaPlugin)
-        .add_plugins(player::PlayerPlugin)
-        .add_plugins(ball::BallPlugin)
-        .run();
+        }),
+        ..default()
+    }))
+    .add_plugins(Wireframe2dPlugin);
+
+    log::info!("[APP] Adding setup");
+    app.add_systems(Startup, setup);
+
+    log::info!("[APP] Adding custom plugins");
+    app.add_plugins(arena::ArenaPlugin)
+        .add_plugins(paddle::PaddlePlugin)
+        .add_plugins(ball::BallPlugin);
+
+    log::info!("App built");
+
+    app.run();
 }
