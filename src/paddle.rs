@@ -14,12 +14,6 @@ impl Plugin for PaddlePlugin {
 }
 
 #[derive(Component)]
-struct Cpu;
-
-#[derive(Component)]
-struct Player;
-
-#[derive(Component)]
 pub struct Paddle;
 
 fn add_paddles(

@@ -45,7 +45,6 @@
       in
         with pkgs; {
           devShells.default = mkShell {
-            RUST_LOG = "debug";
             RUST_SRC_PATH = "${rust.packages.stable.rustPlatform.rustLibSrc}";
             LD_LIBRARY_PATH = libPath;
 

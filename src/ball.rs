@@ -1,6 +1,6 @@
-use bevy::math::bounding::{Aabb2d, BoundingCircle, BoundingVolume, IntersectsVolume};
-
 use super::*;
+use crate::rng::FloatRng;
+use bevy::math::bounding::{Aabb2d, BoundingCircle, BoundingVolume, IntersectsVolume};
 
 pub struct BallPlugin;
 
@@ -33,17 +33,22 @@ fn spawn_ball(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    mut rng: GlobalEntropy<WyRand>,
 ) {
     let shape = meshes.add(Circle::new(PLAYER_WIDTH));
     let color = materials.add(Color::WHITE);
-    let velocity = Vec2::new(-BALL_INIT_SPEED, BALL_INIT_SPEED);
+
+    let initial_x_speed = BALL_INIT_SPEED;
+    let initial_y_speed = BALL_INIT_SPEED * rng.next_percentage_clamped(0.75..=1.0);
+
+    let velocity = Vec2::new(-initial_x_speed, initial_y_speed);
 
     commands.spawn((
         Ball,
         Velocity(velocity),
         Mesh2d(shape),
         MeshMaterial2d(color),
-        Transform::from_xyz(0.0, 0.0, 0.0),
+        Transform::from_xyz(0.0, rng.next_f32_range(WIN_Y_START..=WIN_Y_END), 0.0),
     ));
 }
 
@@ -57,6 +62,7 @@ fn check_collisions(
     ball: Single<(&Transform, &mut Velocity), With<Ball>>,
     colliders: Query<(&Transform, Option<&crate::paddle::Paddle>), With<crate::Collider>>,
     mut col_events: EventWriter<CollisionEvent>,
+    mut rng: GlobalEntropy<WyRand>,
 ) {
     let (ball_transform, mut ball_velocity) = ball.into_inner();
 
@@ -66,8 +72,6 @@ fn check_collisions(
         .iter()
         .filter_map(|(c_trans, paddle)| ball_collision(&ball_bounds, c_trans).map(|c| (c, paddle)))
     {
-        println!("COLLISION: {collision:?}");
-
         // Send Collision event to use for sounds
         col_events.send_default();
 
@@ -79,7 +83,7 @@ fn check_collisions(
 
         // Update ball velocity on player collisions
         if maybe_paddle.is_some() {
-            ball_velocity.0 *= BALL_SPEEDUP_FACTOR;
+            ball_velocity.0 *= 1.0 + rng.next_percentage();
         }
     }
 }
